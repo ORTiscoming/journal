@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="心靈小本">
+<meta name="theme-color" content="#c8f0e8">
+<title>心靈小本</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:linear-gradient(145deg,#c8f0e8 0%,#b8dff5 50%,#cce8f7 100%);}
+body{display:flex;justify-content:center;align-items:flex-start;font-family:'Nunito',sans-serif;}
+
+.phone{
+  width:100%;max-width:430px;height:100vh;height:100dvh;
+  background:linear-gradient(160deg,#d4f2ea 0%,#bde4f7 100%);
+  display:flex;flex-direction:column;overflow:hidden;position:relative;
+}
+
+.statusbar{padding:env(safe-area-inset-top, 12px) 20px 0;padding-top:max(env(safe-area-inset-top),12px);display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:#2a5a5a;flex-shrink:0;}
+
+.screen{flex:1;display:none;flex-direction:column;overflow:hidden;min-height:0;}
+.screen.active{display:flex;}
+
+/* HOME */
+.home-header{padding:12px 20px 8px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.h-greeting{font-size:13px;color:#2a6a6a;font-weight:600;}
+.h-name{font-size:18px;font-weight:800;color:#1a4a4a;}
+.icon-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.7);border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+.mood-bar{margin:6px 16px 10px;background:rgba(255,255,255,0.7);border-radius:20px;padding:12px 14px;flex-shrink:0;}
+.mchips{display:flex;gap:6px;}
+.mchip{flex:1;padding:7px 2px;border-radius:14px;border:2px solid transparent;background:rgba(255,255,255,0.6);text-align:center;cursor:pointer;font-size:10px;font-weight:700;color:#4a8a8a;font-family:'Nunito',sans-serif;transition:all .15s;}
+.mchip span{font-size:17px;display:block;margin-bottom:2px;}
+.mchip.sel{background:#3cc8a8;color:white;border-color:#2ab898;}
+.entries-list{flex:1;overflow-y:auto;padding:0 16px 4px;-webkit-overflow-scrolling:touch;}
+.entry-card-h{border-radius:18px;padding:12px 14px;margin-bottom:9px;cursor:pointer;}
+.ec-top{display:flex;align-items:center;gap:9px;margin-bottom:6px;}
+.ec-dot{width:34px;height:34px;border-radius:50%;background:rgba(60,200,168,0.15);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.ec-date{font-size:10px;color:#7ab8b8;font-weight:600;}
+.ec-mood-lbl{font-size:12px;font-weight:700;color:#1a4a4a;}
+.ec-preview{font-size:12px;color:#5a8888;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+
+/* CALENDAR */
+.cal-header{padding:10px 16px 6px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.cal-nav{display:flex;align-items:center;gap:8px;}
+.cal-nav-btn{background:rgba(255,255,255,0.6);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:#1a4a4a;}
+.cal-month-txt{font-size:15px;font-weight:800;color:#1a4a4a;}
+.cal-write-btn{background:#3cc8a8;border:none;border-radius:12px;padding:5px 12px;font-size:11px;font-weight:700;color:white;cursor:pointer;font-family:'Nunito',sans-serif;}
+.mood-summary{margin:6px 14px 6px;background:rgba(255,255,255,0.65);border-radius:16px;padding:10px 14px;flex-shrink:0;}
+.ms-title{font-size:10px;font-weight:700;color:#5a9a9a;margin-bottom:6px;}
+.ms-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.ms-item{display:flex;align-items:center;gap:3px;font-size:10px;color:#4a7a7a;font-weight:600;}
+.ms-dot{width:8px;height:8px;border-radius:50%;}
+.cal-grid-wrap{padding:0 12px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.cal-wds{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;}
+.cwd{text-align:center;font-size:9px;font-weight:700;color:#7ab8b8;padding:2px 0;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-cell{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .1s;}
+.cal-cell.today{background:rgba(60,200,168,0.15);outline:2px solid #3cc8a8;}
+.cal-cell.has-entry{background:rgba(255,255,255,0.75);}
+.cal-cell.empty,.cal-cell.future{cursor:default;}
+.cell-num{font-size:10px;font-weight:700;color:#5a8888;}
+.cal-cell.today .cell-num{color:#1a8a6a;font-weight:800;}
+.cal-cell.future .cell-num{color:#aad0d0;}
+.cell-emoji{font-size:16px;margin-bottom:1px;}
+
+/* STATS */
+.stats-hdr{padding:14px 20px 10px;display:flex;align-items:center;flex-shrink:0;}
+.stats-ttl{font-size:17px;font-weight:800;color:#1a4a4a;}
+.stats-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;}
+.affirmation-card{margin:0 14px 12px;border-radius:22px;padding:16px 18px;position:relative;overflow:hidden;}
+.aff-emoji{font-size:28px;margin-bottom:8px;display:block;}
+.aff-tag{font-size:9px;font-weight:800;letter-spacing:0.8px;margin-bottom:6px;opacity:0.75;}
+.aff-text{font-size:13px;font-weight:700;line-height:1.6;}
+.aff-deco{position:absolute;right:-10px;bottom:-14px;font-size:64px;opacity:0.12;}
+.section-card{margin:0 14px 10px;background:rgba(255,255,255,0.72);border-radius:20px;padding:14px 16px;}
+.sc-title{font-size:12px;font-weight:800;color:#4a8a8a;margin-bottom:12px;letter-spacing:0.3px;}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.bar-emoji{font-size:16px;width:22px;text-align:center;flex-shrink:0;}
+.bar-lbl{font-size:10px;color:#7ab8b8;font-weight:600;min-width:28px;}
+.bar-track{flex:1;height:10px;background:rgba(60,200,168,0.12);border-radius:6px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:6px;}
+.bar-count{font-size:11px;font-weight:800;color:#1a4a4a;min-width:20px;text-align:right;}
+.week-dots{display:flex;justify-content:space-between;}
+.wd-item{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.wd-circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.wd-empty{background:rgba(60,200,168,0.1);border:1.5px dashed rgba(60,200,168,0.35);}
+.wd-label{font-size:9px;color:#7ab8b8;font-weight:700;}
+.wd-today-lbl{font-size:9px;color:#3cc8a8;font-weight:800;}
+.pills-row{display:flex;gap:6px;flex-wrap:wrap;}
+.pill{padding:5px 12px;border-radius:12px;font-size:11px;font-weight:700;}
+
+/* WRITE */
+.write-header{padding:12px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.back-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.7);border:none;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;}
+.write-ttl{font-size:15px;font-weight:800;color:#1a4a4a;flex:1;}
+.write-date{font-size:11px;color:#7ab8b8;font-weight:600;margin:0 20px 10px;flex-shrink:0;}
+.write-moods{padding:0 16px 10px;display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;}
+.wm-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.7);border:2px solid transparent;cursor:pointer;font-size:19px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.wm-btn.sel{border-color:#3cc8a8;background:rgba(60,200,168,0.15);transform:scale(1.1);}
+.write-area{flex:1;padding:0 16px;min-height:0;}
+textarea{width:100%;height:100%;min-height:120px;background:rgba(255,255,255,0.75);border:none;border-radius:18px;padding:14px;font-size:16px;line-height:1.7;color:#1a4a4a;font-family:'Nunito',sans-serif;resize:none;outline:none;}
+textarea::placeholder{color:#9acaca;}
+.save-btn{margin:10px 16px 6px;padding:13px;border-radius:18px;border:none;background:#3cc8a8;color:white;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;flex-shrink:0;}
+
+/* CELEBRATE */
+.cel-screen{position:absolute;inset:0;background:linear-gradient(160deg,#d4f2ea,#bde4f7);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:2rem;}
+.cel-screen.show{display:flex;}
+.cloud-svg{width:110px;height:90px;margin-bottom:16px;animation:floaty 2.5s ease-in-out infinite;}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.cel-ttl{font-size:24px;font-weight:800;color:#1a4a4a;text-align:center;margin-bottom:8px;}
+.cel-sub{font-size:13px;color:#4a8a8a;text-align:center;line-height:1.6;margin-bottom:24px;}
+.cel-close{padding:12px 32px;border-radius:18px;border:none;background:#1a3a3a;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;}
+.conf-c{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.cp{position:absolute;opacity:0;}
+@keyframes cfall{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(600deg);opacity:0}}
+
+/* NAV */
+.bottom-nav{
+  margin:8px 14px;
+  margin-bottom:max(14px, env(safe-area-inset-bottom));
+  background:#1a3a3a;border-radius:22px;padding:9px 18px;
+  display:flex;justify-content:space-around;align-items:center;flex-shrink:0;
+}
+.nav-i{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:3px 7px;border-radius:11px;transition:background .15s;}
+.nav-i.active{background:rgba(60,200,168,0.25);}
+.ni{font-size:17px;}
+.nl{font-size:9px;color:rgba(255,255,255,0.5);font-weight:700;}
+.nav-i.active .nl{color:#3cc8a8;}
+.nav-plus{width:42px;height:42px;border-radius:50%;background:#3cc8a8;border:none;cursor:pointer;font-size:22px;color:white;display:flex;align-items:center;justify-content:center;margin-top:-16px;box-shadow:0 4px 12px rgba(60,200,168,0.4);}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span id="clockDisplay">9:41</span><span>☁️</span></div>
+
+  <!-- HOME -->
+  <div class="screen active" id="s-home">
+    <div class="home-header">
+      <div><div class="h-greeting" id="greetingTxt">早安 ☁️</div><div class="h-name">今天感覺如何？</div></div>
+      <button class="icon-btn">🔔</button>
+    </div>
+    <div class="mood-bar">
+      <div style="font-size:11px;color:#5a9a9a;font-weight:700;margin-bottom:8px;">現在的心情</div>
+      <div class="mchips" id="homeChips">
+        <div class="mchip" onclick="pickHM(this,'😊')"><span>😊</span>開心</div>
+        <div class="mchip" onclick="pickHM(this,'😌')"><span>😌</span>平靜</div>
+        <div class="mchip" onclick="pickHM(this,'😔')"><span>😔</span>低落</div>
+        <div class="mchip" onclick="pickHM(this,'😤')"><span>😤</span>煩躁</div>
+        <div class="mchip" onclick="pickHM(this,'🥰')"><span>🥰</span>感恩</div>
+      </div>
+    </div>
+    <div style="padding:4px 16px 6px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+      <span style="font-size:14px;font-weight:800;color:#1a4a4a;">最近日記</span>
+      <button style="background:none;border:none;font-size:11px;color:#3cc8a8;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;" onclick="goStats()">查看統計 ›</button>
+    </div>
+    <div class="entries-list" id="homeList"></div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="screen" id="s-cal">
+    <div class="cal-header">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="chMonth(-1)">‹</button>
+        <div class="cal-month-txt" id="calMonthTxt"></div>
+        <button class="cal-nav-btn" onclick="chMonth(1)">›</button>
+      </div>
+      <button class="cal-write-btn" onclick="goWrite()">＋ 寫日記</button>
+    </div>
+    <div class="mood-summary" id="moodSummary"></div>
+    <div class="cal-grid-wrap">
+      <div class="cal-wds">
+        <div class="cwd">日</div><div class="cwd">一</div><div class="cwd">二</div>
+        <div class="cwd">三</div><div class="cwd">四</div><div class="cwd">五</div><div class="cwd">六</div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="screen" id="s-stats">
+    <div class="stats-hdr"><div class="stats-ttl">📊 心情統計</div></div>
+    <div class="stats-scroll" id="statsScroll"></div>
+  </div>
+
+  <!-- WRITE -->
+  <div class="screen" id="s-write">
+    <div class="write-header">
+      <button class="back-btn" onclick="goBack()">←</button>
+      <div class="write-ttl" id="writeTtl">今天的日記</div>
+    </div>
+    <div class="write-date" id="writeDateLbl"></div>
+    <div class="write-moods" id="writeMoods"></div>
+    <div class="write-area"><textarea id="writeTA" placeholder="把今天的故事寫下來..."></textarea></div>
+    <button class="save-btn" onclick="doSave()">儲存日記 ✦</button>
+    <div style="height:6px;flex-shrink:0;"></div>
+  </div>
+
+  <!-- CELEBRATE -->
+  <div class="cel-screen" id="celScreen">
+    <div class="conf-c" id="confC"></div>
+    <svg class="cloud-svg" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="60" cy="62" rx="48" ry="34" fill="#7dd8f0"/>
+      <circle cx="38" cy="50" r="22" fill="#7dd8f0"/>
+      <circle cx="62" cy="44" r="26" fill="#7dd8f0"/>
+      <circle cx="84" cy="52" r="18" fill="#7dd8f0"/>
+      <circle cx="46" cy="64" r="6" fill="#1a3a3a"/>
+      <circle cx="74" cy="64" r="6" fill="#1a3a3a"/>
+      <circle cx="48" cy="62" r="2" fill="white"/>
+      <circle cx="76" cy="62" r="2" fill="white"/>
+      <path d="M50 74 Q60 82 70 74" stroke="#1a3a3a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="cel-ttl" id="celTtl">耶！你好棒！</div>
+    <div class="cel-sub" id="celSub">今天也記錄了自己的心情<br>繼續照顧好自己 🌿</div>
+    <button class="cel-close" onclick="closeCel()">謝謝你 ✦</button>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="nav-i active" id="nav-home" onclick="goHome()"><span class="ni">🏠</span><span class="nl">首頁</span></div>
+    <div class="nav-i" id="nav-cal" onclick="goCalendar()"><span class="ni">📅</span><span class="nl">月曆</span></div>
+    <button class="nav-plus" onclick="goWrite()">＋</button>
+    <div class="nav-i" id="nav-stats" onclick="goStats()"><span class="ni">📊</span><span class="nl">統計</span></div>
+    <div class="nav-i"><span class="ni">👤</span><span class="nl">我的</span></div>
+  </nav>
+</div>
+
+<script>
+const MONTHS=['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+const MOODBG={'😊':'#fff9e0','😌':'#e0f7ef','😐':'#f0efeb','😔':'#e0eef9','😤':'#fdeee8','🥰':'#fce8f2','😴':'#eeebfc'};
+const MOODCOL={'😊':'#f5c842','😌':'#3cc8a8','😐':'#b4b2a9','😔':'#85b7eb','😤':'#f0997b','🥰':'#ed93b1','😴':'#afa9ec'};
+const MOODLBL={'😊':'心情愉快','😌':'平靜放鬆','😐':'普通還好','😔':'有點低落','😤':'感到煩躁','🥰':'充滿愛意','😴':'懶洋洋的'};
+const MSGS=[
+  {t:'耶！你好棒！',s:'今天也記錄了自己的心情\n繼續照顧好自己 🌿'},
+  {t:'太厲害了！',s:'把心情寫下來，\n是很勇敢的事'},
+  {t:'你做到了！',s:'每一篇日記都是\n送給未來自己的禮物'},
+  {t:'好溫柔的你',s:'謝謝你今天\n照顧了自己的心情'},
+];
+const CONF=['#3cc8a8','#7dd8f0','#fad97b','#ed93b1','#b8d4e8','#f4c0d1'];
+const AFF_MAP={
+  '😊':{bg:'#fffbe6',text:'#7a6010',deco:'😊',tag:'本月最多：開心',msgs:['保持這份好心情，它會感染身邊的人','陽光的你，讓周圍也變得明亮了','記得把這份快樂收藏起來，低落時再拿出來看看']},
+  '😌':{bg:'#e6f9f3',text:'#1a6a5a',deco:'🌿',tag:'本月最多：平靜',msgs:['平靜是一種力量，你找到了自己的節奏','心靜如水，這樣的狀態很珍貴','繼續保持這份從容，你做得很好']},
+  '😔':{bg:'#e8f0fa',text:'#2a4a7a',deco:'🌧',tag:'本月最多：低落',msgs:['低落的日子也是日子，允許自己慢慢來','你已經很努力了，今天可以好好休息','給自己一個擁抱，明天又是新的開始']},
+  '😤':{bg:'#fdeee8',text:'#7a3a20',deco:'🌬',tag:'本月最多：煩躁',msgs:['面對煩躁的心情，深呼吸三秒，看向遠方，照顧自己最重要','先停下來，喝杯水，煩躁也會過去的','你的情緒是真實的，但它不會永遠停留']},
+  '🥰':{bg:'#fceaf3',text:'#7a2a5a',deco:'💗',tag:'本月最多：感恩',msgs:['充滿愛意的你，一定也被很多人珍惜著','把這份溫暖繼續傳遞出去吧','感恩的心讓生活更美好']},
+  '😴':{bg:'#eeeaf9',text:'#3a2a7a',deco:'🌙',tag:'本月最多：疲憊',msgs:['好好休息不是懈怠，是對自己的尊重','身體累了就先放下，明天的事明天再說','充足的睡眠是最好的療癒']},
+  '😐':{bg:'#f0efeb',text:'#5a5a5a',deco:'☁️',tag:'本月最多：平淡',msgs:['平淡的日子也有它的美','就這樣安靜地存在著，也很好','普通的一天，積累起來就是不普通的人生']},
+};
+
+let entries={},selMood='',editDate=null,prevScreen='s-home';
+const today=new Date();
+const todayKey=fk(today);
+let viewY=today.getFullYear(),viewM=today.getMonth();
+
+function fk(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function pk(k){const[y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d);}
+function load(){try{const s=localStorage.getItem('mj_app');if(s)entries=JSON.parse(s);}catch(e){}}
+function sv(){try{localStorage.setItem('mj_app',JSON.stringify(entries));}catch(e){}}
+
+function updateClock(){
+  const n=new Date();
+  document.getElementById('clockDisplay').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+  const h=n.getHours();
+  document.getElementById('greetingTxt').textContent=h<12?'早安 ☀️':h<18?'午安 🌤':h<22?'晚上好 🌙':'夜深了 🌛';
+}
+
+function setNav(id){
+  ['nav-home','nav-cal','nav-stats'].forEach(n=>{
+    const el=document.getElementById(n);
+    if(el)el.classList.toggle('active',(n==='nav-home'&&id==='s-home')||(n==='nav-cal'&&id==='s-cal')||(n==='nav-stats'&&id==='s-stats'));
+  });
+}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  setNav(id);
+}
+function goHome(){showScreen('s-home');renderHome();}
+function goCalendar(){showScreen('s-cal');renderCalendar();}
+function goStats(){showScreen('s-stats');renderStats();}
+function goBack(){
+  if(prevScreen==='s-cal')goCalendar();
+  else if(prevScreen==='s-stats')goStats();
+  else goHome();
+}
+function goWrite(dateKey){
+  prevScreen=document.querySelector('.screen.active').id;
+  editDate=dateKey||todayKey;
+  const d=pk(editDate);
+  document.getElementById('writeTtl').textContent=editDate===todayKey?'今天的日記':'補寫日記';
+  document.getElementById('writeDateLbl').textContent=d.getFullYear()+'年 '+MONTHS[d.getMonth()]+' '+d.getDate()+'日';
+  const ex=entries[editDate];
+  document.getElementById('writeTA').value=ex?ex.text:'';
+  selMood=ex?ex.mood:'';
+  renderWriteMoods();
+  showScreen('s-write');
+  setTimeout(()=>document.getElementById('writeTA').focus(),200);
+}
+function pickHM(el,m){document.querySelectorAll('#homeChips .mchip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');selMood=m;}
+function renderWriteMoods(){
+  document.getElementById('writeMoods').innerHTML=['😊','😌','😐','😔','😤','🥰','😴'].map(m=>
+    `<button class="wm-btn ${selMood===m?'sel':''}" onclick="pickWM('${m}')">${m}</button>`).join('');
+}
+function pickWM(m){selMood=m;renderWriteMoods();}
+function doSave(){
+  const text=document.getElementById('writeTA').value.trim();
+  if(!text){document.getElementById('writeTA').focus();return;}
+  entries[editDate]={text,mood:selMood,ts:Date.now()};
+  sv();
+  const msg=MSGS[Math.floor(Math.random()*MSGS.length)];
+  document.getElementById('celTtl').textContent=msg.t;
+  document.getElementById('celSub').innerHTML=msg.s.replace('\n','<br>');
+  document.getElementById('celScreen').classList.add('show');
+  spawnConf();
+}
+function spawnConf(){
+  const c=document.getElementById('confC');c.innerHTML='';
+  for(let i=0;i<40;i++){
+    const p=document.createElement('div');p.className='cp';
+    const col=CONF[Math.floor(Math.random()*CONF.length)];
+    const x=Math.random()*100,delay=Math.random()*.9,dur=1.3+Math.random()*1.2,sz=5+Math.random()*8;
+    p.style.cssText=`left:${x}%;top:0;width:${sz}px;height:${sz}px;background:${col};border-radius:${Math.random()>.5?'50%':'2px'};animation:cfall ${dur}s ${delay}s ease-in forwards;`;
+    c.appendChild(p);
+    setTimeout(()=>{if(p.parentNode)p.parentNode.removeChild(p);},(delay+dur+.3)*1000);
+  }
+}
+function closeCel(){
+  document.getElementById('celScreen').classList.remove('show');
+  if(prevScreen==='s-cal')goCalendar();
+  else if(prevScreen==='s-stats')goStats();
+  else goHome();
+}
+function renderHome(){
+  const keys=Object.keys(entries).sort((a,b)=>b.localeCompare(a)).slice(0,6);
+  const list=document.getElementById('homeList');
+  if(!keys.length){list.innerHTML=`<div style="text-align:center;padding:2rem;color:#7ab8b8;font-size:13px;font-weight:600;">還沒有日記，寫下第一篇吧 ☁️</div>`;return;}
+  list.innerHTML=keys.map(k=>{
+    const e=entries[k],d=pk(k);
+    const lbl=k===todayKey?'今天':MONTHS[d.getMonth()]+' '+d.getDate()+'日';
+    const bg=MOODBG[e.mood]||'rgba(255,255,255,0.8)';
+    return `<div class="entry-card-h" style="background:${bg};" onclick="goWrite('${k}')">
+      <div class="ec-top"><div class="ec-dot">${e.mood||'📝'}</div>
+      <div><div class="ec-date">${lbl}</div><div class="ec-mood-lbl">${MOODLBL[e.mood]||'心情記錄'}</div></div></div>
+      <div class="ec-preview">${e.text.replace(/</g,'&lt;')}</div></div>`;
+  }).join('');
+}
+function getMoodCounts(keys){const c={};keys.forEach(k=>{const m=entries[k].mood;if(m)c[m]=(c[m]||0)+1;});return c;}
+function topMood(counts){let top='',max=0;Object.entries(counts).forEach(([m,n])=>{if(n>max){max=n;top=m;}});return top;}
+function calcStreak(){let s=0;const d=new Date(today);while(entries[fk(d)]){s++;d.setDate(d.getDate()-1);}return s;}
+function renderStats(){
+  const now=new Date();
+  const dow=now.getDay();
+  const weekStart=new Date(now);weekStart.setDate(now.getDate()-dow);
+  const weekKeys=Object.keys(entries).filter(k=>{const d=pk(k);return d>=weekStart&&d<=now;});
+  const monthKeys=Object.keys(entries).filter(k=>{const d=pk(k);return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();});
+  const monthCounts=getMoodCounts(monthKeys);
+  const weekCounts=getMoodCounts(weekKeys);
+  const top=topMood(monthCounts);
+  const aff=AFF_MAP[top]||{bg:'#e6f9f3',text:'#1a6a5a',deco:'🌿',tag:'本月心情',msgs:['每一天都是全新的開始，繼續加油！']};
+  const affMsg=aff.msgs[Math.floor(Math.random()*aff.msgs.length)];
+  const allMoods=['😊','😌','😐','😔','😤','🥰','😴'];
+  const maxW=Math.max(1,...Object.values(weekCounts));
+  const maxM=Math.max(1,...Object.values(monthCounts));
+  const wdNames=['日','一','二','三','四','五','六'];
+  const weekDots=Array.from({length:7},(_,i)=>{
+    const d=new Date(weekStart);d.setDate(weekStart.getDate()+i);
+    const k=fk(d);const e=entries[k];const isT=k===todayKey;const isFut=d>now;
+    return `<div class="wd-item"><div class="wd-circle ${e?'':'wd-empty'}" style="${e?'background:'+(MOODBG[e.mood]||'#fff')+';':''}">${e?e.mood:''}</div><div class="${isT?'wd-today-lbl':'wd-label'}">${isT?'今天':wdNames[i]}</div></div>`;
+  }).join('');
+  const mBar=(counts,max)=>allMoods.filter(m=>counts[m]).sort((a,b)=>(counts[b]||0)-(counts[a]||0)).map(m=>{
+    const n=counts[m]||0;const w=Math.round((n/max)*100);
+    return `<div class="bar-row"><span class="bar-emoji">${m}</span><span class="bar-lbl">${MOODLBL[m].slice(2)}</span><div class="bar-track"><div class="bar-fill" style="width:${w}%;background:${MOODCOL[m]||'#3cc8a8'};"></div></div><span class="bar-count">${n}</span></div>`;
+  }).join('');
+  document.getElementById('statsScroll').innerHTML=`
+    <div class="affirmation-card" style="background:${aff.bg};">
+      <span class="aff-emoji">${top||'🌿'}</span>
+      <div class="aff-tag" style="color:${aff.text};">${aff.tag}</div>
+      <div class="aff-text" style="color:${aff.text};">${affMsg}</div>
+      <div class="aff-deco">${aff.deco}</div>
+    </div>
+    <div class="section-card"><div class="sc-title">本週每日心情</div><div class="week-dots">${weekDots}</div></div>
+    <div class="section-card"><div class="sc-title">本週心情分佈 · 共 ${weekKeys.length} 篇</div>${weekKeys.length?mBar(weekCounts,maxW):'<div style="font-size:12px;color:#9acaca;font-weight:600;text-align:center;padding:8px 0;">本週還沒有記錄 ☁️</div>'}</div>
+    <div class="section-card"><div class="sc-title">本月心情分佈 · 共 ${monthKeys.length} 篇</div>${monthKeys.length?mBar(monthCounts,maxM):'<div style="font-size:12px;color:#9acaca;font-weight:600;text-align:center;padding:8px 0;">本月還沒有記錄 ☁️</div>'}</div>
+    <div class="section-card"><div class="sc-title">記錄里程碑</div><div class="pills-row"><div class="pill" style="background:#e0f7ef;color:#1a6a5a;">🔥 連續 ${calcStreak()} 天</div><div class="pill" style="background:#e8f0fa;color:#2a4a7a;">📝 共 ${Object.keys(entries).length} 篇</div><div class="pill" style="background:#fceaf3;color:#7a2a5a;">📅 本月 ${monthKeys.length} 篇</div></div></div>
+    <div style="height:8px;"></div>`;
+}
+function chMonth(dir){viewM+=dir;if(viewM>11){viewM=0;viewY++;}if(viewM<0){viewM=11;viewY--;}renderCalendar();}
+function renderCalendar(){
+  document.getElementById('calMonthTxt').textContent=viewY+'年 '+MONTHS[viewM];
+  const first=new Date(viewY,viewM,1);const startDay=first.getDay();const dim=new Date(viewY,viewM+1,0).getDate();
+  const mKeys=Object.keys(entries).filter(k=>{const d=pk(k);return d.getFullYear()===viewY&&d.getMonth()===viewM;});
+  const counts=getMoodCounts(mKeys);const total=mKeys.length;
+  const el=document.getElementById('moodSummary');
+  if(!total){el.innerHTML=`<div class="ms-title">本月心情總覽</div><div style="font-size:11px;color:#9acaca;font-weight:600;">這個月還沒有日記 ☁️</div>`;}
+  else{
+    const items=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([m,n])=>`<div class="ms-item"><div class="ms-dot" style="background:${MOODCOL[m]||'#ccc'};"></div><span style="font-size:13px;">${m}</span><span style="font-size:11px;font-weight:800;color:#1a4a4a;">${n}</span></div>`).join('');
+    el.innerHTML=`<div class="ms-title">本月共 ${total} 篇 · 心情分佈</div><div class="ms-row">${items}</div>`;
+  }
+  let html='';
+  for(let i=0;i<startDay;i++)html+=`<div class="cal-cell empty"></div>`;
+  for(let d=1;d<=dim;d++){
+    const key=viewY+'-'+String(viewM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const isT=key===todayKey,isFut=key>todayKey,e=entries[key];
+    html+=e
+      ?`<div class="cal-cell has-entry ${isT?'today':''}" style="background:${MOODBG[e.mood]||'rgba(255,255,255,.75)'};" onclick="goWrite('${key}')"><div class="cell-emoji">${e.mood||'📝'}</div><div class="cell-num">${d}</div></div>`
+      :`<div class="cal-cell ${isT?'today':''} ${isFut?'future':''}" ${!isFut?`onclick="goWrite('${key}')"`:''} style="cursor:${isFut?'default':'pointer'};"><div class="cell-num">${d}</div></div>`;
+  }
+  document.getElementById('calGrid').innerHTML=html;
+}
+
+load();
+updateClock();
+setInterval(updateClock,30000);
+renderHome();
+</script>
+</body>
+</html>
